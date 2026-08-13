@@ -112,6 +112,21 @@
     }
   }
 
+  /* ---- back link ---- */
+
+  .back-link {
+    grid-column: 1 / -1;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: var(--grey);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    width: fit-content;
+  }
+
+  .back-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
   /* ---- section rail ---- */
 
   .rail { display: none; }
@@ -493,6 +508,8 @@
 </head>
 <body>
 <div class="shell">
+
+  <a class="back-link" href="/research/">&larr; Research</a>
 
   <nav class="rail" aria-label="Sections">
     <div class="rail-title">Contents</div>
