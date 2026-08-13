@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Research</title>
+<style>
+  :root {
+    --ground: #F1F3F3;
+    --surface: #FAFBFB;
+    --ink: #16191B;
+    --ink-soft: #40484A;
+    --grey: #6B7376;
+    --rule: #CFD6D6;
+    --accent: #17646E;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #121516;
+      --surface: #1A1E20;
+      --ink: #E4E7E7;
+      --ink-soft: #B4BCBD;
+      --grey: #8B9496;
+      --rule: #2E3537;
+      --accent: #55B0BB;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 2.3rem;
+    line-height: 1.15;
+    margin: 0.5rem 0 0;
+  }
+
+  .intro {
+    color: var(--ink-soft);
+    max-width: 56ch;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  li {
+    border-top: 1px solid var(--rule);
+    padding: 1.4rem 0;
+  }
+
+  li:last-child { border-bottom: 1px solid var(--rule); }
+
+  li a {
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--display);
+    font-size: 1.25rem;
+  }
+
+  li a:hover { color: var(--accent); }
+
+  .meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-top: 0.3rem;
+  }
+
+  .desc {
+    color: var(--ink-soft);
+    margin-top: 0.5rem;
+    max-width: 56ch;
+  }
+
+  footer {
+    font-size: 0.85rem;
+    color: var(--grey);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Research</div>
+      <h1>Notes, comparisons, and decisions</h1>
+      <p class="intro">A running archive of research write-ups — the kind of thing that
+        used to be a one-off Claude Artifact. Unlisted; not part of
+        <a href="https://todhilton.com">todhilton.com</a>'s regular site.</p>
+    </header>
+
+    <ul>
+      <li>
+        <a href="/leaving-lightroom/">Leaving Lightroom — A Migration Reference</a>
+        <div class="meta">August 2026</div>
+        <p class="desc">Eighteen years of Nikon and Leica raw files, a firm no-more-subscriptions
+          condition, and a full comparison of what survives a move off Adobe Lightroom
+          Classic — licensing, format support, edit migration, and the final decision.</p>
+      </li>
+    </ul>
+
+    <footer>Not indexed, not linked from elsewhere — findable only by direct URL.</footer>
+  </div>
+</body>
+</html>

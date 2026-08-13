@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Leaving Lightroom — A Migration Reference</title>
+<style>
+  :root {
+    --ground:      #F1F3F3;
+    --surface:     #FAFBFB;
+    --surface-alt: #E7EBEB;
+    --ink:         #16191B;
+    --ink-soft:    #40484A;
+    --grey:        #6B7376;
+    --rule:        #CFD6D6;
+    --accent:      #17646E;
+    --accent-soft: #DCEBED;
+    --keep:        #2E6B52;
+    --part:        #8A6520;
+    --loss:        #97402F;
+    --keep-bg:     #E2EEE8;
+    --part-bg:     #F3EAD8;
+    --loss-bg:     #F3E2DE;
+
+    --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:      #121516;
+      --surface:     #1A1E20;
+      --surface-alt: #23292B;
+      --ink:         #E4E7E7;
+      --ink-soft:    #B4BCBD;
+      --grey:        #8B9496;
+      --rule:        #2E3537;
+      --accent:      #55B0BB;
+      --accent-soft: #163236;
+      --keep:        #63B98F;
+      --part:        #D3A053;
+      --loss:        #E08573;
+      --keep-bg:     #163025;
+      --part-bg:     #33280F;
+      --loss-bg:     #351E19;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #121516;
+    --surface:     #1A1E20;
+    --surface-alt: #23292B;
+    --ink:         #E4E7E7;
+    --ink-soft:    #B4BCBD;
+    --grey:        #8B9496;
+    --rule:        #2E3537;
+    --accent:      #55B0BB;
+    --accent-soft: #163236;
+    --keep:        #63B98F;
+    --part:        #D3A053;
+    --loss:        #E08573;
+    --keep-bg:     #163025;
+    --part-bg:     #33280F;
+    --loss-bg:     #351E19;
+  }
+
+  :root[data-theme="light"] {
+    --ground:      #F1F3F3;
+    --surface:     #FAFBFB;
+    --surface-alt: #E7EBEB;
+    --ink:         #16191B;
+    --ink-soft:    #40484A;
+    --grey:        #6B7376;
+    --rule:        #CFD6D6;
+    --accent:      #17646E;
+    --accent-soft: #DCEBED;
+    --keep:        #2E6B52;
+    --part:        #8A6520;
+    --loss:        #97402F;
+    --keep-bg:     #E2EEE8;
+    --part-bg:     #F3EAD8;
+    --loss-bg:     #F3E2DE;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 6rem;
+  }
+
+  @media (min-width: 1100px) {
+    .shell {
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 4rem;
+      padding-top: 5rem;
+    }
+  }
+
+  /* ---- section rail ---- */
+
+  .rail { display: none; }
+
+  @media (min-width: 1100px) {
+    .rail {
+      display: block;
+      position: sticky;
+      top: 3rem;
+      align-self: start;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+  }
+
+  .rail-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--grey);
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .rail ol {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .rail a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+
+  .rail a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---- flow ---- */
+
+  .flow {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2.75rem;
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: 1rem; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(2.1rem, 5.5vw, 3.1rem);
+    line-height: 1.1;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    max-width: 20ch;
+  }
+
+  .standfirst {
+    font-family: var(--display);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 58ch;
+  }
+
+  .byline {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--grey);
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+  }
+
+  section { display: flex; flex-direction: column; gap: 1.1rem; scroll-margin-top: 2rem; }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 1.72rem;
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    max-width: 26ch;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--ink);
+  }
+
+  h3 {
+    font-family: var(--body);
+    font-size: 0.95rem;
+    font-weight: 650;
+    letter-spacing: 0.005em;
+    margin-top: 0.5rem;
+  }
+
+  p, li { max-width: var(--measure); }
+  p { color: var(--ink-soft); }
+  strong { color: var(--ink); font-weight: 640; }
+
+  a { color: var(--accent); text-underline-offset: 2px; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  ul.bullets, ol.bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-left: 1.15rem;
+    color: var(--ink-soft);
+  }
+  ul.bullets { list-style: none; }
+  ul.bullets > li { position: relative; }
+  ul.bullets > li::before {
+    content: "";
+    position: absolute;
+    left: -1.15rem;
+    top: 0.68em;
+    width: 5px; height: 5px;
+    background: var(--grey);
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.855em;
+    background: var(--surface-alt);
+    padding: 0.12em 0.36em;
+    border-radius: 2px;
+    word-break: break-word;
+  }
+
+  /* ---- verdict chips ---- */
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.16rem 0.46rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .chip::before { content: ""; width: 5px; height: 5px; border-radius: 50%; flex: none; }
+  .chip--keep { color: var(--keep); background: var(--keep-bg); }
+  .chip--keep::before { background: var(--keep); }
+  .chip--part { color: var(--part); background: var(--part-bg); }
+  .chip--part::before { background: var(--part); }
+  .chip--loss { color: var(--loss); background: var(--loss-bg); }
+  .chip--loss::before { background: var(--loss); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.1rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    align-items: center;
+  }
+  .legend > span { display: inline-flex; align-items: center; gap: 0.45rem; }
+
+  /* ---- tables ---- */
+
+  .scroll {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 540px;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  thead th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--grey);
+    font-weight: 400;
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    background: var(--surface-alt);
+    white-space: nowrap;
+  }
+
+  tbody td, tbody th {
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    text-align: left;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  tbody th { color: var(--ink); font-weight: 600; }
+  tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+  td .price { font-family: var(--mono); font-size: 0.9em; white-space: nowrap; }
+
+  /* ---- callouts ---- */
+
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.15rem 1.35rem;
+    border-radius: 3px;
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+  }
+  .note p, .note li { max-width: 62ch; }
+
+  .note--warn { border-left-color: var(--part); background: var(--part-bg); }
+  .note--warn p, .note--warn li { color: var(--ink); }
+
+  .note-label {
+    font-family: var(--mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .note--warn .note-label { color: var(--part); }
+
+  .unverified {
+    border: 1px dashed var(--rule);
+    border-radius: 3px;
+    padding: 1.25rem 1.4rem;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* ---- steps (a real sequence, so it earns numbering) ---- */
+
+  .steps { display: flex; flex-direction: column; gap: 1.5rem; counter-reset: step; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .step::before {
+    counter-increment: step;
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+    padding-top: 0.12rem;
+    border-top: 2px solid var(--accent);
+  }
+
+  .step-body { display: flex; flex-direction: column; gap: 0.55rem; }
+  .step-body h3 { margin-top: 0; }
+
+  /* ---- verdict cards ---- */
+
+  .picks { display: flex; flex-direction: column; gap: 1rem; }
+
+  .pick {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.2rem 1.4rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+
+  .pick-rank {
+    font-family: var(--mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  .pick-name { font-family: var(--display); font-size: 1.28rem; line-height: 1.25; }
+  .pick-name .cost { font-family: var(--mono); font-size: 0.72rem; color: var(--grey); letter-spacing: 0.03em; }
+  .pick--lead { border-left: 3px solid var(--accent); }
+  .pick--lead .pick-rank { color: var(--accent); }
+  .pick--avoid .pick-name { color: var(--ink-soft); }
+
+  .pick--chosen { border-left: 3px solid var(--keep); background: var(--keep-bg); }
+  .pick--chosen .pick-rank { color: var(--keep); }
+
+  .decision {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.3rem 1.5rem;
+    border: 1px solid var(--keep);
+    border-left: 4px solid var(--keep);
+    border-radius: 3px;
+    background: var(--keep-bg);
+  }
+
+  .decision-label {
+    font-family: var(--mono);
+    font-size: 0.67rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--keep);
+  }
+
+  .decision-headline {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .decision dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3rem 1.1rem;
+    font-size: 0.85rem;
+    margin-top: 0.2rem;
+  }
+  .decision dt {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--grey);
+    padding-top: 0.18em;
+  }
+  .decision dd { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .sources { font-size: 0.83rem; color: var(--grey); max-width: var(--measure); }
+  .sources a { color: var(--grey); }
+  .sources a:hover { color: var(--accent); }
+
+  footer {
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.83rem;
+    color: var(--grey);
+    max-width: var(--measure);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <nav class="rail" aria-label="Sections">
+    <div class="rail-title">Contents</div>
+    <ol>
+      <li><a href="#safety-net">The safety net</a></li>
+      <li><a href="#edits">Your edits won't survive</a></li>
+      <li><a href="#licensing">Licensing reality</a></li>
+      <li><a href="#formats">Format support</a></li>
+      <li><a href="#avalanche">Avalanche</a></li>
+      <li><a href="#smugmug">SmugMug</a></li>
+      <li><a href="#plan">The plan</a></li>
+      <li><a href="#picks">The decision</a></li>
+      <li><a href="#unverified">Still open</a></li>
+    </ol>
+  </nav>
+
+  <main class="flow">
+
+    <header class="masthead">
+      <div class="eyebrow">Migration reference</div>
+      <h1>Leaving Lightroom</h1>
+      <p class="standfirst">Eighteen years of Nikon and Leica raw files in one catalog, an iPhone library that lives entirely in Apple Photos, a SmugMug account, and one firm condition: no more subscriptions.</p>
+      <div class="byline">
+        <span>Researched August 2026</span>
+        <span>Catalog: Nikon D90 &amp; D750 · Leica D-Lux 7</span>
+        <span>Apple Photos: iPhone HEIC — out of scope</span>
+        <span>macOS</span>
+      </div>
+
+      <div class="decision">
+        <span class="decision-label">Decided · 9 August 2026</span>
+        <div class="decision-headline">ON1 Photo RAW 2026, purchased.</div>
+        <dl>
+          <dt>Paid</dt><dd>$55.29 including tax, against a $99.99 list price — the promotion running through 13 August</dd>
+          <dt>Licence</dt><dd>Perpetual. Keeps working indefinitely; future version upgrades optional and paid</dd>
+          <dt>Why</dt><dd>The only paid contender treating perpetual licensing as a first-class product, with a native Lightroom migration assistant, SmugMug publishing, and D-Lux 7 RWL support since 2019.2</dd>
+        </dl>
+        <p>Everything below is now an execution reference rather than an evaluation. The comparison is kept as a record of the reasoning, and in case the decision ever needs revisiting.</p>
+      </div>
+    </header>
+
+    <section id="safety-net">
+      <h2>Start here: Lightroom keeps working after you cancel</h2>
+      <p>This is the finding that reframes everything else. Cancelling a Creative Cloud subscription does not kill Lightroom Classic — it degrades it. You do not have to solve the migration problem perfectly, because the old catalog remains open, readable, and exportable indefinitely.</p>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th scope="col">Capability</th><th scope="col">After cancelling</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Develop module</th><td><span class="chip chip--loss">Blocked</span></td></tr>
+            <tr><th scope="row">Map module</th><td><span class="chip chip--loss">Blocked</span></td></tr>
+            <tr><th scope="row">Cloud &amp; mobile sync</th><td><span class="chip chip--loss">Blocked</span></td></tr>
+            <tr><th scope="row">Library module</th><td><span class="chip chip--keep">Full</span></td></tr>
+            <tr><th scope="row">Quick Develop</th><td><span class="chip chip--keep">Works</span> — it lives inside Library, so basic exposure and white balance survive</td></tr>
+            <tr><th scope="row">Import &amp; keywording</th><td><span class="chip chip--keep">Works</span></td></tr>
+            <tr><th scope="row">Export</th><td><span class="chip chip--keep">Works</span> — including “Original + Settings”</td></tr>
+            <tr><th scope="row">Publish Services</th><td><span class="chip chip--keep">Works</span> — your SmugMug publisher keeps running</td></tr>
+            <tr><th scope="row">Print · Slideshow · Web · Book</th><td><span class="chip chip--keep">Works</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <span class="note-label">What this means</span>
+        <p>Freeze Lightroom Classic 15.5 rather than uninstalling it. Any edit you fail to carry across is still retrievable later, which turns an irreversible decision into a reversible one. If any images live in Lightroom <em>cloud</em>, note that Adobe gives you one year to download them — the local Classic catalog has no such clock.</p>
+      </div>
+
+      <p class="sources">Sources: <a href="https://www.lightroomqueen.com/cancel-cc-subscription-photos/">Lightroom Queen, updated Feb 2025</a> · <a href="https://helpx.adobe.com/lightroom-classic/kb/develop-module-disabled.html">Adobe — Develop module disabled</a> · <a href="https://asktimgrey.com/2022/12/01/impact-of-canceling-lightroom-classic-subscription/">Ask Tim Grey</a> · <a href="https://www.dpreview.com/articles/3538565258/adobe-lightroom-allows-users-continued-access-after-license-expires">DPReview</a></p>
+    </section>
+
+    <section id="edits">
+      <h2>No tool migrates your develop edits faithfully</h2>
+      <p>Every vendor claiming edit migration is either approximating four to six global sliders or using AI to guess an equivalent. The reason is architectural: Adobe's develop settings are instructions for Adobe Camera Raw's engine, and nobody else runs that engine.</p>
+      <p>Capture One's own documentation concedes it — <em>“Some settings in Lightroom like color edits cannot be imported… Adjustments to Saturation, White Balance, Contrast and Exposure are approximate.”</em> ON1's blog is equally direct: <em>“ON1 can't take the exact instructions Lightroom creates and produce the same results.”</em></p>
+
+      <div class="legend">
+        <span><span class="chip chip--keep">Survives</span> reliably, everywhere</span>
+        <span><span class="chip chip--part">Partial</span> approximate or tool-dependent</span>
+        <span><span class="chip chip--loss">Lost</span> in every practical path</span>
+      </div>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th scope="col">Your data</th><th scope="col">Outcome</th><th scope="col">Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Originals &amp; folder structure</th><td><span class="chip chip--keep">Survives</span></td><td>Untouched in place</td></tr>
+            <tr><th scope="row">Star ratings</th><td><span class="chip chip--keep">Survives</span></td><td>Maps 1:1 everywhere</td></tr>
+            <tr><th scope="row">Color labels</th><td><span class="chip chip--keep">Survives</span></td><td>Must be set to English names first</td></tr>
+            <tr><th scope="row">Keywords, incl. hierarchy</th><td><span class="chip chip--keep">Survives</span></td><td>The most valuable thing you own</td></tr>
+            <tr><th scope="row">IPTC — caption, title, copyright</th><td><span class="chip chip--keep">Survives</span></td><td></td></tr>
+            <tr><th scope="row">Capture time</th><td><span class="chip chip--keep">Survives</span></td><td></td></tr>
+            <tr><th scope="row">GPS coordinates</th><td><span class="chip chip--part">Partial</span></td><td>Survives most paths; one contrary report against Capture One's importer</td></tr>
+            <tr><th scope="row">Global develop edits</th><td><span class="chip chip--part">Partial</span></td><td>Four approximated sliders at best; often looks wrong anyway</td></tr>
+            <tr><th scope="row">Collections</th><td><span class="chip chip--part">Partial</span></td><td>Carried by Capture One, ON1, Exposure, ACDSee, Avalanche</td></tr>
+            <tr><th scope="row">Virtual copies</th><td><span class="chip chip--part">Partial</span></td><td>Only Avalanche → Capture One</td></tr>
+            <tr><th scope="row">Pick / reject flags</th><td><span class="chip chip--part">Partial</span></td><td>Only Exposure and Avalanche</td></tr>
+            <tr><th scope="row">Local adjustments, masks, brushes</th><td><span class="chip chip--loss">Lost</span></td><td>Healing, clone, spot removal, gradients — universally</td></tr>
+            <tr><th scope="row">Edit history &amp; snapshots</th><td><span class="chip chip--loss">Lost</span></td><td>Universally</td></tr>
+            <tr><th scope="row">Smart collections</th><td><span class="chip chip--loss">Lost</span></td><td>Convert the important ones to regular collections first</td></tr>
+            <tr><th scope="row">Stacks</th><td><span class="chip chip--loss">Lost</span></td><td>Universally</td></tr>
+            <tr><th scope="row">Presets</th><td><span class="chip chip--loss">Lost</span></td><td>Except Avalanche, which converts them to Capture One Styles</td></tr>
+            <tr><th scope="row">Face / people tags</th><td><span class="chip chip--loss">Lost</span></td><td>ACDSee claims an importer; digiKam can read Lightroom's XMP face regions</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The XMP paradox</h3>
+      <p>Writing metadata to XMP sidecars does embed Adobe's develop settings — but as an Adobe Camera Raw instruction block only Adobe products can interpret. To any other app it's inert text, with darktable the sole partial exception. So XMP is a perfect insurance policy for returning to Adobe, and a metadata-only transfer to anything else.</p>
+    </section>
+
+    <section id="licensing">
+      <h2>Licensing reality, since this is your reason for leaving</h2>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th scope="col">App</th><th scope="col">Model</th><th scope="col">Cost</th><th scope="col">Verdict</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">ON1 Photo RAW 2026</th><td>True perpetual</td><td class="price">~$99.99</td>
+              <td><span class="chip chip--keep">Sound</span> Perpetual is a first-class product</td>
+            </tr>
+            <tr>
+              <th scope="row">DxO PhotoLab 9</th><td>True perpetual</td><td class="price">$149.99 / $239.99</td>
+              <td><span class="chip chip--keep">Sound</span> Skip two versions and you repay full price</td>
+            </tr>
+            <tr>
+              <th scope="row">ACDSee Photo Studio Mac 26</th><td>True perpetual</td><td class="price">$99.99</td>
+              <td><span class="chip chip--keep">Sound</span> Often discounted to $54.95</td>
+            </tr>
+            <tr>
+              <th scope="row">Capture One Pro</th><td>Hybrid, subscription-favored</td><td class="price">~$317</td>
+              <td><span class="chip chip--part">Caution</span> Perpetual works forever but is frozen</td>
+            </tr>
+            <tr>
+              <th scope="row">Exposure X7</th><td>Perpetual</td><td class="price">~$129</td>
+              <td><span class="chip chip--loss">Avoid</span> Abandonware</td>
+            </tr>
+            <tr>
+              <th scope="row">digiKam · darktable</th><td>GPL, free</td><td class="price">$0</td>
+              <td><span class="chip chip--keep">Sound</span> No lock-in of any kind</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note note--warn">
+        <span class="note-label">The Capture One caveat</span>
+        <p>A perpetual license still exists and keeps working — but since 14 February 2023 it ships with <strong>zero feature updates</strong>, bug fixes only, until the next paid version. Scraping their live pricing page, the perpetual SKU is still internally keyed to <code>23-pro-license</code> while subscribers run 16.8.4. They raised all prices 6% on 2 June 2026, the second consecutive annual increase. You would be fleeing subscription pricing into a vendor actively starving its perpetual tier — and you likely never get support for your <em>next</em> camera.</p>
+      </div>
+
+      <p class="sources">Sources: <a href="https://www.dpreview.com/news/3164356226/capture-one-perpetual-licenses-no-longer-include-new-features-functionality-after-purchase/">DPReview on the perpetual change</a> · <a href="https://petapixel.com/2026/05/27/capture-one-to-increase-all-product-prices-by-6/">PetaPixel on the 2026 increase</a> · <a href="https://www.newsshooter.com/2026/06/01/capture-one-raises-prices-again-is-it-still-worth-it-or-time-to-jump-ship/">Newsshooter</a></p>
+    </section>
+
+    <section id="formats">
+      <h2>Your three formats, and where they break</h2>
+
+      <div class="note">
+        <span class="note-label">Your library is split, and that simplifies everything</span>
+        <p>The iPhone photos live in <strong>Apple Photos syncing to iCloud</strong>, not in the Lightroom catalog — and they turn out to be HEIC, not ProRAW. So the app you're choosing only ever has to open <strong>Nikon NEF and Leica RWL</strong>. Two formats, from three cameras, all of them yours for years.</p>
+        <p>This removes the constraint that was disqualifying two of the strongest editors. The ProRAW and JPEG-XL columns below are kept for reference only, in case you enable ProRAW later or consolidate the two libraries.</p>
+      </div>
+
+      <div class="note note--warn">
+        <span class="note-label">The D-Lux 7 shoots RWL, not DNG</span>
+        <p>This is the format detail that drives everything below. The D-Lux 7 (2018) writes Leica's proprietary <code>.RWL</code> — a Panasonic-derived format inherited from the LX100 II. Only the D-Lux <em>8</em> (2024) moved to standard DNG, which Leica treated as a headline improvement. So you have <strong>two proprietary raw formats and one DNG source</strong>, not the other way around.</p>
+        <p>Your two Nikons share one column because they share one format. The <strong>D90 (2008)</strong> is a non-issue everywhere — Capture One has read it since version 4.8.3, and darktable ships both white balance presets and a noise profile for it, its highest support tier. Seventeen years of maturity, and a sidecar format, so nothing gets rewritten in place.</p>
+      </div>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th scope="col">App</th><th scope="col">Nikon NEF <span style="text-transform:none;letter-spacing:0">(D90 · D750)</span></th><th scope="col">D-Lux 7 RWL</th><th scope="col">iPhone ProRAW <span style="text-transform:none;letter-spacing:0">(ref.)</span></th><th scope="col">JPEG-XL <span style="text-transform:none;letter-spacing:0">(ref.)</span></th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">ON1 2026</th><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--keep">Since 2019.2</span></td><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--loss">No</span></td></tr>
+            <tr><th scope="row">Capture One 16.8</th><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--part">Contested</span></td><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--loss">No</span></td></tr>
+            <tr><th scope="row">ACDSee Mac 26</th><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--part">Untested</span></td><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--part">Untested</span></td></tr>
+            <tr><th scope="row">DxO PhotoLab 9</th><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--keep">Since 3.2</span></td><td><span class="chip chip--part">Crippled</span></td><td><span class="chip chip--loss">No</span></td></tr>
+            <tr><th scope="row">darktable</th><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--keep">Yes, w/ noise profile</span></td><td><span class="chip chip--loss">No</span></td><td><span class="chip chip--loss">No</span></td></tr>
+            <tr><th scope="row">Exposure X7</th><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--keep">Likely</span></td><td><span class="chip chip--loss">No</span></td><td><span class="chip chip--loss">No</span></td></tr>
+            <tr><th scope="row">Lightroom Classic</th><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--keep">Since Dec 2018</span></td><td><span class="chip chip--keep">Yes</span></td><td><span class="chip chip--keep">Yes</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Where this leaves each option</h3>
+      <ul class="bullets">
+        <li><strong>Capture One is the only genuine format risk left.</strong> Leica's own software support originally stated flatly that D-Lux 7 RWL files <em>“cannot be edited with Capture One,”</em> and Capture One Pro 12 didn't recognize them. Support was reportedly added around Capture One 20 Pro, but the current official camera list returns 403 to automated checks and recent release notes mention the D-Lux <em>8</em> without ever naming the 7. <strong>Treat this as unresolved and test it first.</strong></li>
+        <li><strong>DxO is back in contention — the objection no longer applies.</strong> Its ProRAW limitation was the reason to rule it out, and ProRAW isn't in your catalog. On the files you actually have, DeepPRIME works fully: the D-Lux 7 since PhotoLab 3.2, both Nikons long since. On a 2008-sensor D90 in particular, DeepPRIME is the kind of difference that makes old high-ISO frames usable again. <span class="sources"><a href="https://forum.dxo.com/t/support-of-leica-d-lux-7/5741">DxO forum — D-Lux 7 support</a></span></li>
+        <li><strong>darktable is viable too</strong>, on format grounds — full support for the D90 including noise profile and white balance presets, and a noise profile for the D-Lux 7. Its remaining weaknesses are ergonomics and the learning curve, not your files.</li>
+        <li><strong>Exposure X7 remains the one to skip.</strong> It almost certainly reads a 2018 camera's files, so the Leica was never the real problem — but there has been no release since September 2021 and no camera support since July 2024. Buying into a dead product to escape a subscription is a poor trade.</li>
+      </ul>
+
+      <p class="sources">Sources: <a href="https://www.digitalcameraworld.com/buying-guides/leica-d-lux-8-vs-d-lux-7-does-the-baby-q-merit-an-upgrade">Digital Camera World — D-Lux 8 vs D-Lux 7</a> · <a href="https://www.darktable.org/resources/camera-support/">darktable camera support list</a> · <a href="https://www.macfilos.com/2019/02/11/on1-aw-leica-d-lux-7-in-latest-on1-photo-raw-release/">Macfilos — ON1 2019.2 adds D-Lux 7</a> · <a href="https://www.reddotforum.com/content/2018/12/adobe-lightroom-classic-cc-8-1-and-camera-raw-cc-11-1-updates-now-support-d-lux-7-m10-d-and-m10-p/">Red Dot Forum — Adobe adds D-Lux 7</a> · <a href="https://www.dpreview.com/forums/thread/4345618">DPReview — D-Lux 7 raw thread</a></p>
+
+      <div class="note">
+        <span class="note-label">JPEG-XL: not a factor for you</span>
+        <p>Adobe is currently the only desktop editor here with real JPEG-XL support — Capture One has an <a href="https://captureone.ideas.aha.io/ideas/FR-I-1908">open feature request</a> and nothing shipped. It costs you nothing, for two independent reasons: those files never leave Apple Photos, and your iPhone is set to <code>JPEG Lossless (Most Compatible)</code> rather than either JPEG-XL mode, so they wouldn't be JPEG-XL anyway.</p>
+        <p>See <a href="#plan">the plan</a> for what that setting actually means — it's a compression choice inside a DNG, not a JPEG.</p>
+      </div>
+    </section>
+
+    <section id="avalanche">
+      <h2>Avalanche, the one migration tool worth buying</h2>
+      <p>Made by CYME, macOS-only, roughly $59 for the Capture One edition. It is meaningfully better than Capture One's own importer, and it is the only tool that carries several things nothing else does.</p>
+      <ul class="bullets">
+        <li><strong>Virtual copies → Capture One variants</strong> — precisely what Capture One's native importer fails at</li>
+        <li><strong>Lightroom presets → Capture One Styles</strong></li>
+        <li>Collections, projects and sets with hierarchy intact</li>
+        <li>Flags, color labels, GPS, keywords, Exif and IPTC</li>
+        <li>AI-converted global tone and color, including Clarity and Dehaze</li>
+      </ul>
+      <p>It still does not migrate masks or local adjustments. Nothing does. Supports Lightroom Classic catalogs from version 5 onward; macOS 10.15+.</p>
+      <div class="note note--warn">
+        <span class="note-label">Verify before buying</span>
+        <p>I could not confirm Avalanche has been validated against Capture One 16.8 or Lightroom Classic 15.x catalog formats — their published claims still center on Capture One 23. Trial it against a small exported catalog first.</p>
+      </div>
+      <p class="sources">Source: <a href="https://cyme.io/en/products/avalanche/capture-one/">cyme.io — Avalanche for Capture One</a></p>
+    </section>
+
+    <section id="smugmug">
+      <h2>SmugMug, where you lose the most convenience</h2>
+      <p>Lightroom's two-way Publish Service is the best SmugMug desktop integration that exists, and nothing outside Adobe matches it. Outside Adobe your options narrow sharply:</p>
+      <ul class="bullets">
+        <li><strong>Capture One</strong> — SmugMug's own official plugin, macOS only. Upload only: <em>“will not sync folders between your desktop and SmugMug site.”</em></li>
+        <li><strong>ON1</strong> — built-in SmugMug publishing since 2020. <span class="chip chip--part">Unconfirmed</span> for the 2026 release; the feature page is login-gated. Verify in trial.</li>
+        <li><strong>DxO, ACDSee, Exposure, darktable, digiKam</strong> — nothing at all.</li>
+        <li><strong>App-agnostic routes</strong> — <a href="https://www.smugmughelp.com/hc/en-us/articles/38683855335828-macOS-Uploader-App">SmugMug's official macOS Uploader</a> (updated January 2026), <a href="https://customsmug.com/folio">Folio</a>, Smugly, PhotoSync.</li>
+      </ul>
+      <p>Since you already publish exported high-resolution JPEGs, export-to-folder into the macOS Uploader is a perfectly serviceable replacement. And remember that a frozen Lightroom Classic keeps its SmugMug Publish Service running — you could keep publishing from there indefinitely.</p>
+    </section>
+
+    <section id="plan">
+      <h2>The plan</h2>
+      <p>Budget a week, not a weekend. Fstoppers' April 2026 assessment calls migration <em>“painful”</em> though <em>“no longer impossible.”</em> The consensus among photographers who have actually moved a fifteen-year archive: don't chase the edits, chase the findability.</p>
+
+      <div class="note note--warn">
+        <span class="note-label">Cancel last, not early</span>
+        <p>The order below matters more than any individual step. Cancelling your subscription kills the Develop module, and every step that might need re-doing depends on it. <strong>Do not cancel until the new app is proven against your actual library.</strong> Everything Adobe-side is reversible right up until that point.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-body">
+            <h3>Pre-flight — back up, then check the catalog is healthy</h3>
+            <p>Full copy of the photo tree <em>and</em> the <code>.lrcat</code>, <code>.lrcat-data</code> and previews, on separate media. Open the backup and confirm it's readable — an unverified backup isn't one.</p>
+            <p>Then run <code>File › Optimize Catalog</code>, and take a Lightroom backup with <strong>“Test integrity before backing up”</strong> checked. You are about to run bulk operations across your whole archive; find out now if the catalog has latent corruption, not halfway through.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-body">
+            <h3>Prove ON1 on your own files before cancelling anything</h3>
+            <p>The purchase is made, but the verification still matters — and it matters <em>more</em> now, because this is the step that catches a bad fit while Lightroom is still fully alive.</p>
+            <p>Open <strong>one file from each camera</strong>: a D90 NEF, a D750 NEF, a D-Lux 7 RWL. Confirm the SmugMug publishing integration exists in your build. Then point ON1 at a real folder of several thousand images and watch how the library behaves — catalog performance at scale is the variable that decides year three, and no review tests it.</p>
+            <p>If something here disappoints, you have lost $55 and nothing else. Your catalog, your subscription, and every other option remain exactly as they were.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-body">
+            <h3>Bake the metadata out, while you still have Develop</h3>
+            <p>First check <code>Metadata › Color Label Set</code> to see what you're currently using. If you've used custom label names, note them before switching to <strong>Lightroom Default</strong> — switching changes how labels are interpreted, and Capture One needs the English defaults.</p>
+            <p>Then in <code>Catalog Settings › Metadata</code>, check <strong>“Automatically write changes into XMP”</strong> — it's off by default. Select all in Grid view, All Photographs, and run <code>Metadata › Save Metadata to File</code> (<code>⌘S</code>). Roughly five minutes per 17,000 images, so scale accordingly.</p>
+            <p><strong>Expect video files to throw errors.</strong> Lightroom cannot write metadata into video at all — those failures are normal and not a sign the run went wrong.</p>
+            <div class="note">
+              <span class="note-label">Barely modifies anything, as it turns out</span>
+              <p>This step is usually the risky one. For your catalog it is close to harmless. <strong>Every raw file you own takes a sidecar</strong> — NEF and RWL are both proprietary formats, so Lightroom writes a separate <code>.xmp</code> and leaves the originals byte-for-byte untouched. There are no DNGs in the catalog to rewrite, because the ProRAW files are in Apple Photos.</p>
+              <p>Only derivative JPEGs, TIFFs and PSDs already sitting in the catalog get written into. Your raw archive comes through completely unmodified.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-body">
+            <h3>Bake out the edits worth keeping — but check the scope first</h3>
+            <p>Build a smart collection where <code>Develop › Has Adjustments</code> is true and file type is not video. <strong>Read the image count before you export anything.</strong></p>
+            <div class="note note--warn">
+              <span class="note-label">The trap in this step</span>
+              <p>“Has Adjustments” means <em>any history step beyond Import</em>. If you have ever applied an import preset, auto-tone, or a default develop setting on import, this can match nearly your entire catalog — turning a targeted export into a six-figure file operation and hundreds of gigabytes.</p>
+              <p>If the count is implausibly high, narrow it: add <code>Rating is greater than or equal to 2</code>, or restrict to picked flags, or to the collections you actually revisit. You do not need eighteen years of baked JPEGs. You need the ones you'd be upset to lose.</p>
+            </div>
+            <p>Export to the same folder as the original: JPEG quality 90, or 16-bit TIFF for portfolio work. All Metadata, with location and person info left in, no resizing, no output sharpening, no watermark. Name them <code>[Filename]_lightroom_edit</code> so the baked version sits beside the raw, and stack the pairs once you're in the new app.</p>
+            <p>Confirm free disk space covers the estimate before starting, and run it overnight.</p>
+            <p>Lightroom Classic 15.5's <strong>Render to DNG</strong> is an alternative, though Victoria Bampton notes it produces <em>“a TIFF in a DNG wrapper”</em> — you cannot recover further highlight or shadow detail from it.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-body">
+            <h3>Migrate incrementally, and reconcile before trusting it</h3>
+            <p>Migrate a test slice first — one year, or one folder. If you're heading to Capture One, export each year from Lightroom as its own catalog and import them one at a time; one photographer importing 100,000 images at once saw the grid break and CPU pin at 100%.</p>
+            <p>After each batch, read the importer's skipped-files log, and reconcile image counts per year. Spot-check ratings, keywords and GPS on samples from across the range — 2009, 2014, 2019, 2026 — not just the recent years where problems are least likely.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-body">
+            <h3>Only now: cancel, and keep Lightroom installed</h3>
+            <p>With the new app proven, cancel the subscription. Leave Lightroom Classic 15.5 <strong>installed</strong> — Library, Quick Develop, Export and Publish keep working indefinitely, and that's your permanent fallback.</p>
+            <div class="note note--warn">
+              <span class="note-label">Don't uninstall it, and keep a way back in</span>
+              <p>Reinstalling Lightroom Classic later runs through the Creative Cloud desktop app, and photographers have hit trouble getting it back after a lapsed subscription. Keep the Creative Cloud app installed, keep your Adobe account active, and archive a copy of the installer. If you ever do uninstall, choose <strong>Keep</strong> when asked about preferences.</p>
+            </div>
+            <p><strong>Delete nothing for a year.</strong> Not the old catalog, not the originals, not the Lightroom install.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="note-label">The iPhone library needs no migration plan</span>
+        <p>Your ProRAW files are in Apple Photos syncing to iCloud, and nothing above touches them. That side of your photography is already on a perpetual, non-subscription footing — macOS handles ProRAW and JPEG-XL natively.</p>
+      </div>
+
+      <div class="note">
+        <span class="note-label">Clearing up the ProRAW setting</span>
+        <p><code>ProRAW Format › JPEG Lossless (Most Compatible)</code> does not mean your files are JPEGs. It's a choice of <strong>compression codec inside the DNG container</strong> — the three options are JPEG Lossless (Most Compatible), JPEG-XL Lossless, and JPEG-XL Lossy, and <em>all three produce <code>.DNG</code> files</em>.</p>
+        <p>You've picked the most portable of the three. JPEG-XL-compressed DNGs require iOS 17 / macOS 14 or later to read and break older software; classic JPEG Lossless is the variant essentially every raw converter can open. <strong>So the JPEG-XL concern raised earlier in this document is doubly moot</strong> — those files aren't in your catalog, and they aren't JPEG-XL either.</p>
+      </div>
+
+      <div class="note">
+        <span class="note-label">Resolved — the backup is complete</span>
+        <p><strong>Photos › Media Types › RAW returns 90 images, all roughly ten years old.</strong> Apple ProRAW didn't exist until the iPhone 12 Pro in late 2020, so those can't be ProRAW — they're third-party app DNGs from the era when iOS 10 first opened raw capture to apps, or camera files imported into Photos.</p>
+        <p>The conclusion is clean: <strong>you have never actually captured ProRAW</strong>, your iPhone photography is HEIC, and OneDrive is skipping nothing because there is nothing to skip. The backup gap this document warned about does not exist.</p>
+        <p>The explanation is the Camera app, not the Settings app. ProRAW must be armed by tapping <strong>RAW</strong> before each session, and it resets every time you close the app or lock the phone unless <code>Settings › Camera › Preserve Settings › Apple ProRAW</code> is enabled. Yours evidently isn't.</p>
+      </div>
+
+      <div class="note">
+        <span class="note-label">Two small follow-ups, neither urgent</span>
+        <ul class="bullets">
+          <li><strong>Those 90 raw files are orphans.</strong> They're in Apple Photos, not the Lightroom catalog, so nothing in this plan touches them. Ninety files is trivial to handle — export the originals to a folder alongside your camera archive if they're worth keeping, and they'll be picked up by whichever app you choose.</li>
+          <li><strong>If you want ProRAW going forward, it's one toggle.</strong> Turn on <code>Preserve Settings › Apple ProRAW</code> and the RAW button stays armed between sessions. Given how much of your shooting is now iPhone, the editing latitude is a real gain — at roughly 25 MB per frame, and with the caveat that you'd then need to confirm OneDrive is actually carrying the DNGs, which is the failure mode described above. Keeping <code>JPEG Lossless (Most Compatible)</code> is the right call either way.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <span class="note-label">Time Machine now covers the iPhone library too</span>
+        <p>Time Machine backs up the Photos library faithfully, but only what's actually on the Mac — so with <strong>Optimize Mac Storage</strong> it would have been archiving reduced previews. You've since switched to <strong>Download Originals to this Mac</strong>, which closes that gap: full-resolution originals land locally and Time Machine picks them up.</p>
+        <p><strong>Confirm the download actually finished.</strong> Pulling an entire iCloud library down is a large, slow, background operation, and Time Machine can only back up what has arrived. Open <code>Photos › Settings › iCloud</code> and look for a progress line or “Downloading…” status; the library isn't fully protected until that's clear. Then check your Time Machine destination has room for what may be a substantially larger backup than before.</p>
+      </div>
+
+      <p class="sources">Sources: <a href="https://www.macrumors.com/how-to/iphone-16-pro-choose-jpeg-xl-proraw-formats/">MacRumors — ProRAW format options all render as DNG</a> · <a href="https://support.apple.com/guide/iphone/take-apple-proraw-photos-iphae1e882a3/ios">Apple — Take ProRAW photos</a> · <a href="https://answers.microsoft.com/en-us/msoffice/forum/all/syncing-photos-from-iphone-jpg-works-dng-does-not/3b80eae8-29b2-4f1f-b983-6bdbaae3b0d8">Microsoft Q&amp;A — “.jpg works, .dng does not”</a> · <a href="https://learn.microsoft.com/en-us/answers/questions/5303390/can-onedrive-ios-app-upload-photos-from-icloud-wit">Microsoft Q&amp;A — camera upload with Optimize Storage</a></p>
+
+      <div class="note">
+        <span class="note-label">On DNG conversion — revised for the D-Lux 7</span>
+        <p><strong>Leave the Nikon NEFs alone.</strong> NEF is universally supported and will stay that way; converting them adds a one-way change with no benefit.</p>
+        <p><strong>The Leica RWL files are a different question.</strong> RWL is a proprietary format, from a discontinued camera line, with a documented history of patchy third-party support — the exact profile of a format worth hedging against. Converting a copy to DNG is defensible <em>archival insurance</em> here in a way it isn't for your Nikon files. If you do it: convert copies, keep every original RWL, and do it as a separate project <em>after</em> the migration settles, never during.</p>
+      </div>
+
+      <p class="sources">Sources: <a href="https://www.gyford.com/phil/writing/2025/09/29/migrating-lightroom-digikam/">Phil Gyford's documented migration, Sept 2025</a> · <a href="https://www.lightroomqueen.com/whats-new-in-lightroom-2026-08/">Lightroom Queen — What's New, Aug 2026</a> · <a href="https://fstoppers.com/software/real-reason-photographers-are-leaving-adobe-901527">Fstoppers, April 2026</a> · <a href="https://support.captureone.com/hc/en-us/community/posts/360009402357-Importing-large-Lightroom-Catalogue">Capture One forum on large catalogs</a> · <a href="https://community.adobe.com/t5/lightroom-classic-discussions/losing-access-to-lightroom-classic-after-cancelling-subscription/td-p/12996461">Adobe community — reinstalling after cancellation</a> · <a href="https://community.adobe.com/t5/lightroom-classic/smart-collections-in-lightroom-quot-adjustments-quot-vs-quot-edits-quot/td-p/9204068">Adobe community — “Has Adjustments” criterion</a></p>
+    </section>
+
+    <section id="picks">
+      <h2>The decision, and what it cost</h2>
+      <p>The two research threads disagreed here. One argued against Capture One on vendor and catalog-performance grounds; the other recommended it for migration fidelity. Resolving it: side with the first on the vendor question, the second on tooling.</p>
+      <p>Confirming that the iPhone library stays in Apple Photos reopened the field. The choice is now genuinely between <strong>the best workflow fit</strong> and <strong>the best image quality</strong>, and those are different products.</p>
+
+      <div class="picks">
+        <div class="pick pick--chosen">
+          <div class="pick-rank">Chosen — purchased 9 August 2026</div>
+          <div class="pick-name">ON1 Photo RAW 2026 <span class="cost">$55.29 paid · $99.99 list · perpetual</span></div>
+          <p>The only paid contender that treats perpetual licensing as a first-class product. Native Lightroom migration assistant, SmugMug publishing built in — and it has read D-Lux 7 RWL files since version 2019.2, which is seven years of maturity rather than an open question.</p>
+          <p><strong>Real caveat:</strong> the most complaint-heavy option here. Users report 2026 being <em>“impossibly slower than 2025,”</em> plus crashes and memory leaks on export. The 2026.5 release in July 2026 addresses some of it. <span class="sources"><a href="https://www.dpreview.com/forums/threads/on1-raw-2026-review.4823008/">DPReview thread</a></span></p>
+        </div>
+
+        <div class="pick">
+          <div class="pick-rank">Not chosen — the close runner-up</div>
+          <div class="pick-name">DxO PhotoLab 9 Elite <span class="cost">$239.99 perpetual</span></div>
+          <p>The reason to rule this out is gone. Every file in your catalog is a format DeepPRIME fully supports, and on eighteen-year-old D90 frames that denoise is genuinely transformative rather than a marketing bullet. It is also the cleanest perpetual license of the paid options, with the most rigorous lens-correction work in the industry.</p>
+          <p><strong>The costs are real, though.</strong> There is no Lightroom catalog importer at all — DxO reads XMP sidecars and nothing else, so collections don't come across. Its library module is a file browser with an index, widely described as the weakest DAM here. And there's no SmugMug integration.</p>
+          <p><strong>Best used paired</strong> with digiKam (free) as the actual catalog, which is the strongest DAM of anything free or paid and scales past 100k images comfortably.</p>
+        </div>
+
+        <div class="pick">
+          <div class="pick-rank">Not chosen — the open question is now academic</div>
+          <div class="pick-name">Capture One perpetual + Avalanche <span class="cost">~$375 total</span></div>
+          <p>Best-in-class color rendering, the best migration fidelity available, official SmugMug plugin. But you are buying a frozen 2023-generation product, from a vendor drifting toward subscription, that <em>may or may not</em> open one of your three cameras — and a frozen perpetual license cannot be patched into supporting it later.</p>
+          <p><strong>Load a D-Lux 7 RWL file into the trial before you consider paying.</strong> If it doesn't open, this option is finished.</p>
+        </div>
+
+        <div class="pick pick--avoid">
+          <div class="pick-rank">Don't</div>
+          <div class="pick-name">Exposure X7</div>
+          <p>No release since September 2021, no camera support since July 2024. It reads your files fine; that isn't the problem. Escaping a subscription by buying a dead product is the wrong trade.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <span class="note-label">What the decision costs you, honestly</span>
+        <p>ON1 buys a smooth move: native catalog migration, SmugMug publishing, all your formats, at a fifth of DxO-plus-nothing. What you're giving up is <strong>DeepPRIME</strong> — on eighteen-year-old D90 frames at high ISO, DxO's denoise is genuinely better than anything ON1 ships.</p>
+        <p>That's a defensible trade, and it isn't permanent. DxO PhotoLab runs happily alongside ON1 as a specialist tool for the handful of frames that need rescuing, and its perpetual licence means you can add it in a year without having lost anything. Don't buy it now — find out first whether ON1's NoNoise is good enough on your actual files.</p>
+      </div>
+
+      <div class="note note--warn">
+        <span class="note-label">Do these three things in ON1 this week</span>
+        <ul class="bullets">
+          <li><strong>Open one file from each camera</strong> — a D90 NEF, a D750 NEF, and a D-Lux 7 RWL. Support is documented, but confirm it on your own files before you build anything on top of it.</li>
+          <li><strong>Confirm the SmugMug integration still ships.</strong> This was the one thing research could not verify — ON1's feature page is login-gated. You now own the app, so just look. If it's gone, fall back to export-to-folder plus SmugMug's macOS Uploader, which costs you convenience and nothing else.</li>
+          <li><strong>Check performance before committing.</strong> ON1 2026 drew real complaints about speed and stability, partly addressed in 2026.5. Update — but verify the build behaves before relying on it, because ON1's mid-cycle <code>.5</code> releases have a history of shipping rough.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <span class="note-label">One concern that doesn't apply to you</span>
+        <p>The sharpest published criticism of ON1 isn't about its editing — it's whether its database is a catalogue at all. On the Lightroom Queen forums, John Beardsworth put it directly: <em>“Simply storing its cache in a database doesn't make it a catalogue,”</em> with the offline-drive question as the test that settles it. Lightroom can browse and organize across disconnected drives from one database; a browser-first tool may not.</p>
+        <p><strong>Your archive is entirely on local storage, so this is moot.</strong> It would only become relevant if you later moved older years onto an external drive to reclaim space — worth remembering then, not now.</p>
+        <p>The same thread confirms ON1's sidecars record only <strong>final edit state, not edit history</strong>, which matches everything else here.</p>
+        <p class="sources">Source: <a href="https://www.lightroomqueen.com/community/threads/lightroom-catalogue-vs-on1-non-catalogue.33531/">Lightroom Queen forums — Lightroom catalogue vs ON1 non-catalogue</a>. Lightroom Queen is an Adobe-focused site; Victoria Bampton has not reviewed ON1, and this is user discussion rather than editorial testing.</p>
+      </div>
+    </section>
+
+    <section id="unverified">
+      <h2>What's still open</h2>
+      <div class="unverified">
+        <ul class="bullets">
+          <li><strong>Whether ON1's SmugMug integration still ships in 2026.</strong> The only open question that still affects you — the feature page is login-gated, so research couldn't confirm it. You own the app now; check it directly.</li>
+          <li><strong>How ON1's Lightroom Migration Assistant handles your specific catalog.</strong> ON1's marketing claims it moves Develop settings; ON1's own blog says it cannot reproduce Lightroom's edits. Trust the blog, and confirm on a test slice.</li>
+          <li><em>Moot after the decision, retained for the record:</em> whether Capture One reads D-Lux 7 RWL files; Capture One's exact perpetual price and whether that tier gets new camera support; whether Avalanche is validated against Capture One 16.8 and Lightroom Classic 15.x; whether GPS survives Capture One's importer; ACDSee's claimed face-data import and its D-Lux 7 support.</li>
+        </ul>
+      </div>
+      <p class="sources">Research note: <code>support.captureone.com</code>, <code>helpx.adobe.com</code> and <code>smugmughelp.com</code> all blocked automated fetching. Claims sourced from those domains rest on search-engine extracts of the exact pages plus corroborating independent sources — Lightroom Queen, Ask Tim Grey, DPReview — which agree with each other.</p>
+    </section>
+
+    <footer>
+      <p>Compiled from two parallel research passes, August 2026. Prices and version numbers current as of that date.</p>
+      <p><strong>Decision recorded 9 August 2026:</strong> ON1 Photo RAW 2026 purchased for $55.29 including tax. This page is now an execution reference; the comparison sections are retained as the record of why.</p>
+      <p><strong>Revised 9 August 2026.</strong> The original draft assumed a Leica D-Lux 8. Correcting it to the D-Lux 7 changed the raw format from DNG to proprietary RWL, which moved Capture One from “supported” to “unresolved,” removed the Leica objection to Exposure, reduced the number of files rewritten during metadata export, and reversed the advice on DNG conversion for the Leica archive. A Nikon D90 was added to the gear list the same day; it changed nothing, which is the correct outcome for an eighteen-year-old NEF.</p>
+      <p><strong>Scope narrowed twice on 9 August 2026.</strong> First, confirming the iPhone library lives in Apple Photos rather than the Lightroom catalog; then confirming, via Photos › Media Types › RAW, that no ProRAW has ever actually been captured. Together these removed Apple ProRAW and JPEG-XL from the requirements entirely. That reinstated DxO PhotoLab and darktable — both had been ruled out solely on ProRAW grounds — reduced the metadata step to near-harmless, and turned the recommendation into a real choice between workflow and image quality.</p>
+      <p><strong>The plan was rebuilt the same day</strong> after review found it sequenced cancellation before verification — leaving no way to fix problems once the Develop module was gone. It now runs six steps instead of four, cancels last, adds an explicit trial-and-decide step, a catalog integrity check, a scope check on the edit export, and a warning about reinstalling Lightroom later.</p>
+    </footer>
+
+  </main>
+</div>
+</body>
+</html>
